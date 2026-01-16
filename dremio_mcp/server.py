@@ -18,5 +18,8 @@ def create_server(config: DremioConfig) -> FastMCP:
     catalog.register(server, client)
     reflection.register(server, client)
     docs.register(server, client)
+    
+    from dremio_mcp import prompts
+    prompts.register(server, client)
 
     return server

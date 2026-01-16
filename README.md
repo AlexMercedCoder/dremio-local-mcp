@@ -56,3 +56,5 @@ Copy the output into your `claude_desktop_config.json`.
 ## Documentation
 - [CLI Commands](docs/cli/README.md)
 - [Tools Reference](docs/tools/README.md)
+- [Prompts Reference](docs/prompts/README.md)
+- [Client Configuration](docs/clients.md)

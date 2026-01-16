@@ -13,3 +13,9 @@ Welcome to the documentation for the Dremio Local MCP server.
 - [Query Tools](tools/query.md) (SQL Execution)
 - [Jobs & Reflection Tools](tools/jobs_and_reflection.md) (Analysis, Performance)
 - [Docs Tools](tools/docs.md) (Local Search)
+
+### Prompts
+- [Prompt Reference](prompts/README.md) (Analysis, Optimization, Ops)
+
+### Configuration
+- [Client Configuration](clients.md) (Claude Desktop, etc.)
