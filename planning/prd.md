@@ -12,6 +12,7 @@ The goal is to create an easy-to-use Model Context Protocol (MCP) server for Dre
 - `update_wiki(entity_id, content)`: Update the wiki for a dataset/source.
 - `add_tags(entity_id, tags)`: Tag datasets.
 - `get_semantic_context(entity_id)`: Retrieve wiki, tags, schema.
+- `plan_semantic_layer(goal)`: Propose a semantic layer structure (views, spaces) based on a natural language goal. Returns an ASCII chart and definition plan.
 
 ### 2.2. Query Execution & Safety
 **Goal**: Execute SQL queries safely.
@@ -49,15 +50,18 @@ The goal is to create an easy-to-use Model Context Protocol (MCP) server for Dre
 
 ## 3. Technical Requirements
 - **Language**: Python (FastMCP).
-- **Distribution**: PyPI package (`dremio-mcp`).
+- **Distribution**: PyPI package (`dremio-local-mcp`).
 - **Configuration**:
-    - Use `dremio-cli` (Python) configuration profile (`~/.config/dremio_client/config.yaml`).
-    - CLI command `dremio-mcp config` to assist setup.
+    - Leverages existing `dremio-cli` profiles.
+    - Reads `~/.dremio/profiles.yaml` (or `.env` as fallback).
+    - **Dependency**: usage of `dremio-python-cli` logic where possible/appropriate.
 
 ## 4. User Interaction Flow
-1.  **User installs**: `pip install dremio-mcp`
-2.  **User configures**: `dremio-mcp config` -> Prompts for URL/User/Pass.
-3.  **User runs**: `dremio-mcp start` (or connects via Claude Desktop).
+1.  **User installs**: `pip install dremio-local-mcp` (installs `dremio-python-cli` as dependency).
+2.  **User configures**: Runs standard `dremio` CLI commands to create a profile (or edits `~/.dremio/profiles.yaml`).
+3.  **User verifies**: `dremio-local-mcp test --profile <name>` runs a connectivity check (`SELECT 1`).
+4.  **User sets up Client**: `dremio-local-mcp config` prints the JSON configuration for Claude Desktop or VS Code (Code).
+5.  **User runs**: `dremio-local-mcp start --profile <name>` to launch the MCP server.
 
 ## 5. Next Steps
 1.  Setup Python project.

@@ -1,0 +1,4 @@
+docs
+dremio_mcp
+dremiodocs
+planning
