@@ -1,5 +1,7 @@
 # Project Overview `dremio-local-mcp`
 
+[Full Documentation on Git Repo Here](https://github.com/AlexMercedCoder/dremio-local-mcp)
+
 The `dremio-local-mcp` is a Model Context Protocol (MCP) server that connects AI assistants (like Claude) to your Dremio lakehouse.
 
 ## Features
