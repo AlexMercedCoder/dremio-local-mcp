@@ -8,9 +8,21 @@ class DremioClient:
         # Create client using dremio_cli factory
         self.client = create_client(config.get_dict())
         self.config_data = config.get_dict()
+        self.project_id = self.config_data.get("project_id") or self.config_data.get("project")
+        # Check URL for cloud heuristic
+        url = (self.config_data.get("url") or self.config_data.get("base_url") or "").lower()
+        self.is_cloud = "dremio.cloud" in url
 
     def _request(self, method: str, endpoint: str, **kwargs) -> Any:
-        """Fallback for raw requests using client's helper methods."""
+        # Helper to adjust endpoint for Cloud if necessary
+        # But _request usually takes path relative to base_url.
+        # If client base_url is `https://api.dremio.cloud`, we need to prepend `/v0/projects/{pid}/` if the passed endpoint is `catalog/...`
+        # BUT dremio_cli might handle this? 
+        # Actually dremio_cli is mostly Software focused or minimal.
+        # If we pass specific endpoint `v0/projects/...`, requests usually appends to base.
+        # So we should construct the full relative path in the Tool, and pass it here.
+        # Just return result.
+        
         # Map method to client functions
         if method.upper() == "GET":
             return self.client.get(endpoint, params=kwargs.get("params"))

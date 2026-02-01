@@ -157,3 +157,76 @@ def register(server: FastMCP, client: DremioClient):
             return f"File Content for '{dataset_name}' ({local_path}):\n\n{content}"
         except Exception as e:
             return f"Error reading file: {e}"
+
+    @server.tool()
+    def profile_dataset(path: str) -> str:
+        """
+        Analyze a dataset's quality and structure.
+        Returns: Row count, column types, null counts (estimated from sample), and sample values.
+        """
+        try:
+            # 1. Get Schema
+            path_list = path.split(".")
+            data = client.get_catalog_item(path=path_list)
+            if data.get("entityType") != "dataset":
+                 return f"Error: {path} is not a dataset."
+            
+            fields = data.get("fields", [])
+            col_names = [f.get("name") for f in fields]
+            
+            # 2. Get Row Count
+            # Use safe quoting for path
+            count_sql = f'SELECT COUNT(*) as "cnt" FROM {path}' # Ideally use quote identifier if needed
+            # For simplicity assuming path doesn't have evil chars or handled by Dremio
+            # Better to rely on user provided valid path or Dremio quoting
+            
+            # Let's try basic quoting logic
+            quoted_path = ".".join([f'"{p}"' for p in path_list])
+            
+            try:
+                count_job = client.post_sql(f'SELECT COUNT(*) as "cnt" FROM {quoted_path}')
+                client.wait_for_job(count_job)
+                count_res = client.get_job_results(count_job)
+                row_count = count_res.get("rows", [{}])[0].get("cnt", "Unknown")
+            except:
+                row_count = "Unknown (Count query failed)"
+
+            # 3. Get Sample Data
+            sample_job = client.post_sql(f'SELECT * FROM {quoted_path} LIMIT 20')
+            client.wait_for_job(sample_job)
+            sample_res = client.get_job_results(sample_job)
+            rows = sample_res.get("rows", [])
+            
+            # 4. Analyze Sample in Memory
+            analysis = []
+            analysis.append(f"# Profile: {path}")
+            analysis.append(f"**Total Rows**: {row_count}")
+            analysis.append("")
+            analysis.append("| Column | Type | Est. Nulls (Sample) | Example Value |")
+            analysis.append("| --- | --- | --- | --- |")
+            
+            for field in fields:
+                col = field.get("name")
+                c_type = field.get("type", {}).get("name")
+                
+                # Check sample for nulls and example
+                sample_vals = [r.get(col) for r in rows]
+                if not rows:
+                    null_count = "N/A"
+                    example = "N/A"
+                else:
+                    nulls = sum(1 for v in sample_vals if v is None)
+                    null_pct = int((nulls / len(rows)) * 100)
+                    null_count = f"{null_pct}%"
+                    
+                    # Find first non-null
+                    valid_vals = [v for v in sample_vals if v is not None]
+                    example = str(valid_vals[0]) if valid_vals else "(All Null)"
+                    if len(example) > 50: example = example[:47] + "..."
+                
+                analysis.append(f"| {col} | {c_type} | {null_count} | {example} |")
+                
+            return "\n".join(analysis)
+
+        except Exception as e:
+            return f"Error profiling dataset: {e}"
