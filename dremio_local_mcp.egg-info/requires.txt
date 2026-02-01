@@ -1,5 +1,0 @@
-fastmcp
-requests
-pyyaml
-rich
-dremio-client>=0.1.0

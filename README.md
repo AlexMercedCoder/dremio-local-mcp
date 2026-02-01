@@ -18,18 +18,48 @@ pip install dremio-local-mcp
 
 ## Configuration
 
-This tool uses the standard Dremio CLI configuration format.
+This tool uses the standard Dremio CLI configuration format. You can manage your Dremio credentials using the **dremio-cli** utility (recommended) or manually via a YAML file.
 
-1.  **Configure Profile**:
-    Use the `dremio-cli` or create `~/.dremio/profiles.yaml` manually:
+### Option 1: Using dremio-cli
 
-    ```yaml
-    profiles:
-      default:
-        base_url: "https://api.dremio.cloud"
-        token: "your-pat-token"
-        verify_ssl: true
-    ```
+First, install the CLI (if not already present):
+```bash
+pip install dremio-cli
+```
+
+Then create a profile for your environment:
+
+**For Dremio Cloud:**
+```bash
+# Create a profile named 'default'
+dremio profile create --name default --type cloud --token <your-pat-token> --project-id <your-project-id> --base-url https://api.dremio.cloud
+```
+
+**For Dremio Software:**
+```bash
+# Create a profile named 'software'
+dremio profile create --name software --type software --base-url http://localhost:9047 --username <user> --password <pass>
+```
+*(For Software, `verify_ssl` defaults to `true`. Add `--no-verify-ssl` if using self-signed certs)*
+
+### Option 2: Manual YAML
+
+Create or edit `~/.dremio/profiles.yaml` manually:
+
+```yaml
+default_profile: cloud
+profiles:
+  cloud:
+    base_url: "https://api.dremio.cloud"
+    token: "your-pat-token"
+    project_id: "your-project-id"
+    verify_ssl: true
+  software:
+    base_url: "http://localhost:9047"
+    username: "admin"
+    password: "password123"
+    verify_ssl: false
+```
 
 ## Usage
 
