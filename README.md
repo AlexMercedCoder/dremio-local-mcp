@@ -59,6 +59,29 @@ profiles:
     username: "admin"
     password: "password123"
     verify_ssl: false
+
+### Supported Authentication Flows
+
+This MCP server supports all authentication flows available in `dremio-cli` (v1.10.0+):
+
+1.  **Cloud (PAT)**: Requires `token` and `project_id`.
+2.  **Software (PAT)**: Requires `token` and `base_url`.
+3.  **Software (User/Pass)**: Requires `username`, `password`, and `base_url`.
+4.  **Service (OAuth2 Credentials)**: Requires `client_id`, `client_secret`, and `base_url`.
+
+> [!TIP]
+> **Service/Credentials Flow**: If you are using the Client Credentials flow (common for service accounts), it is recommended to explicitly set the scope in your profile to ensure full access.
+>
+> ```yaml
+> service_profile:
+>   type: "software" # or "cloud"
+>   base_url: "https://dremio.org/api/v3"
+>   auth:
+>     type: "oauth"
+>     client_id: "your-client-id"
+>     client_secret: "your-client-secret"
+>     # scope: "dremio.all" # NOTE: dremio-cli v1.11.0 currently ignores this key and defaults to dremio.all on retry
+> ```
 ```
 
 ## Usage
