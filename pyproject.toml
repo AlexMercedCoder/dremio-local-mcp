@@ -16,7 +16,7 @@ dependencies = [
     "requests",
     "pyyaml",
     "rich",
-    "dremio-client>=0.1.0",
+    "dremio-cli",
     "pytest",
     "pytest-asyncio" 
 ]
